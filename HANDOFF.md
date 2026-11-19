@@ -17,7 +17,7 @@ These decisions incorporate the user's latest clarifications and take precedence
 
 - **Webapp first, ideally running on a PC.** Android remains a secondary target.
 - **Highest sustainable presentation frame rate.** There is no default application-imposed 60 fps cap. Aim to keep pace with the display/browser's available refresh cadence.
-- **Fresh architecture and user experience.** Prism is a reference for useful features. It is not a required fork, codebase, UI, architecture, or compatibility target.
+- **Fresh architecture and user experience.** prism is a reference for useful features. It is not a required fork, codebase, UI, architecture, or compatibility target.
 - **Primary activity: live performance and experimentation.** Precise song timelines and unattended automatic shows can grow from this foundation.
 - **Inputs:** system audio, particularly Spotify; DJ software such as Traktor; microphone/routed input; and audio files played by klobvision.
 - **Music:** optimize initially for 4/4. Manual help with beats, bars, and phrase alignment is expected.
@@ -26,7 +26,9 @@ These decisions incorporate the user's latest clarifications and take precedence
 - **2D visuals first.** Conventional 3D solids and hypercube projections have flexible priority.
 - **Open source:** choose AGPL-3.0-or-later for original project code, preserving the separate licenses and notices of dependencies and assets.
 
-Develop from these requirements. Any proposed reuse from Prism should be a small, explicit engineering choice supported by suitability, licensing, and tests.
+Develop from these requirements. Any proposed reuse from prism should be a small, explicit engineering choice supported by suitability, licensing, and tests.
+
+Apply the owner's existing global product and visual-design standards, restated in section 2 and the contribution rules in section 19. These come from the reviewed `xklob/dotfiles` base `AGENTS.md`. Keep this handoff self-contained for contributors; access to that source repository is not a prerequisite. Explicit project decisions and the user's current instructions take precedence over general defaults. [G1]
 
 ## 2. Product identity and first experience
 
@@ -41,6 +43,25 @@ klobvision combines editable geometric patterns, musical timing, and shader effe
 7. Record the visual output when desired.
 
 The product should work locally without an account. Routine visuals, manual timing, file playback, and local analysis should remain usable offline after the application and required assets are available.
+
+### Editor visual system // global product standards
+
+Use the owner's **klob.io** visual language for the control interface, settings, onboarding, status, and install branding. The requirements below apply to the PC webapp and responsive Android interface; a later native companion should use appropriate native components with the same visual language. [G1]
+
+| Area | Required behavior |
+|---|---|
+| Layout | Compact panels, clear controls and status, and a content-dominant layout. Keep values readable and controls usable as panels collapse or the viewport narrows. |
+| Typography | Self-host **Space Grotesk** with the webapp and bundle it locally in any native app. Include its font license with the distributed assets. Routine use must not depend on an external font service. |
+| Neutral surfaces | Light mode uses white or near-white neutral surfaces with dark text. Dark mode uses black or near-black neutral surfaces with light text. |
+| Green accents | Use bright Paradigm green **`#00FF00`** sparingly for primary actions, selected states, and accents. Use darker **`#007500`** for green text or icons that need readable contrast on light surfaces. Use readable dark labels on bright-green filled controls. Verify text and control contrast in both themes. Avoid olive, muddy yellow-green, or lime substitutes and broadly green-tinted interfaces. |
+| Theme selector | Provide **System / Light / Dark** controls, using icons by default with accessible names and a clear selected state. Start in System mode: use the detected OS/browser preference, falling back to dark when it is unavailable. Follow live system changes while System is selected. Persist explicit choices across reloads and restarts. |
+| App naming | Keep **klobvision** lowercase throughout user-facing branding, including page titles, headers, PWA/launcher labels, catalog entries, release titles, and documentation. Preserve existing API identifiers, package IDs, repository paths, class names, and user-entered names. |
+| Actions and copy | Primary action buttons use uppercase labels, such as `OPEN OUTPUT` and `SAVE LOOK`. App names stay lowercase even within those labels, such as `INSTALL klobvision`. Other labels and instructions are concise, functional, and easy to scan. Avoid slogans and unnecessary marketing prose. |
+| Separators | Prefer restrained `//` separators in branding, headings, and compact label/detail pairs. Preserve ordinary punctuation where needed for prose, accessible labels, URLs, code, and data. |
+
+**Editor appearance and creative content are independent.** Scene palettes, backgrounds, rainbow outlines, shaders, preview pixels, projected output, and recordings are authored content. Switching the editor theme must leave that content and its timing unchanged. Store theme mode as a device preference, separate from projects and looks. The creative presets below retain their own colors and black backgrounds.
+
+Keep essential controls keyboard-accessible, make focus visible, and expose icon names and selected states to assistive technology. Compact panels must preserve access to audio/timing status, output blackout, and recording state.
 
 ### Visual reference: “Platonic Solids”
 
@@ -72,11 +93,11 @@ Create a “Polygon Pulse” preset at **124 BPM**:
 
 Treat these timings as a useful starting design. They are not hardcoded global behavior.
 
-## 3. Feature reference: Prism
+## 3. Feature reference: prism
 
 Reference inspected: [xklob/prism](https://github.com/xklob/prism), commit **97c0acf8e9c794d6925ed279bc660b3153f1f4ba**, version **1.15.0**.
 
-This was a source/documentation review. No Prism builds, tests, or physical-device validation were performed during this handoff.
+This was a source/documentation review. No prism builds, tests, or physical-device validation were performed during this handoff.
 
 Use the following as a feature checklist, with a new implementation and UI where appropriate:
 
@@ -91,7 +112,7 @@ Use the following as a feature checklist, with a new implementation and UI where
 | Song metadata, optional recognition, and diagnostics | Use independent adapters and show the source and reliability of each result |
 | Crowd/shared timing | Consider paired phone controls and multiple receivers after local two-screen operation works |
 
-Prism's current code contains four scene IDs: Kaleido, Wormhole, Mandelbrot, and Kaleidoscope. Some older README paragraphs still describe removed generators. Its current browser dashboard controls native clients; it is not a standalone web visualizer. Its song assistance also does not provide a local acoustic fingerprint index or musical-key estimator. See [P1–P6] below.
+prism's current code contains four scene IDs: Kaleido, Wormhole, Mandelbrot, and Kaleidoscope. Some older README paragraphs still describe removed generators. Its current browser dashboard controls native clients; it is not a standalone web visualizer. Its song assistance also does not provide a local acoustic fingerprint index or musical-key estimator. See [P1–P6] below.
 
 Do not inherit incidental limits such as a fixed 32-look library, one-file cache, complete-analysis-before-playback, specific native recording formats, or a native Android dependency.
 
@@ -100,7 +121,7 @@ Do not inherit incidental limits such as a fixed 32-look library, one-file cache
 | Area | Initial choice | Reason |
 |---|---|---|
 | Language/build | TypeScript, Vite | Straightforward browser development and static deployment |
-| Editor UI | React | Forms, panels, scene management, and responsive layout |
+| Editor UI | React | Forms, compact panels, scene management, and responsive layout following the section 2 visual system |
 | Visual runtime | Three.js with WebGL2 | GPU geometry, instancing, custom shaders, render targets, and a path to later 3D |
 | Effects | An explicit render-pass chain, using Three.js facilities where useful | Ordered effects, predictable compositing, reusable GPU resources |
 | Audio I/O | Web Audio API | Local playback, capture streams, and a common audio graph |
@@ -283,7 +304,7 @@ Pitch, chroma, and musical key are distinct outputs. Allow key to be unknown dur
 |---|---|---|
 | Meyda | Basic audio features | A feature library, not a complete rhythm/structure engine |
 | Essentia.js | Tonal analysis and selected file/live algorithms | Evaluate particular algorithms; whole-track methods are not automatically causal |
-| BeatNet | Learned beat/downbeat activations | Evaluate model/runtime/frontend together; Prism is one example integration |
+| BeatNet | Learned beat/downbeat activations | Evaluate model/runtime/frontend together; prism is one example integration |
 | Beat This! Live | Online beat/downbeat tracking | Promising alternative; integration and sustained performance need assessment |
 | ONNX Runtime Web | Browser inference for compatible exported models | WASM worker baseline; GPU inference only after measurement |
 
@@ -291,7 +312,7 @@ Meyda supports live and offline extraction. Essentia.js exposes analysis through
 
 Do a short, comparative technical spike, then choose and document a backend. Do not build a product dependency on a research model before checking runtime support, distribution rights, latency, and behavior on representative music.
 
-Keep the analyzer replaceable. Exact parity with Prism is not a requirement.
+Keep the analyzer replaceable. Exact parity with prism is not a requirement.
 
 Select live rhythm tracking, offline file analysis, and key estimation independently. They share versioned result types and timestamp conventions, but need not use the same library or model. Each provider must declare whether it is causal, its required sample rate, and the latency or lookahead associated with its output timestamps.
 
@@ -368,7 +389,7 @@ Return match confidence, offset, observed playback rate, timestamp, and validity
 
 ### Optional catalog recognition
 
-Prism illustrates a useful pattern: local information first, optional catalog lookup, and opt-in acoustic recognition. klobvision can use a similar hierarchy with independently chosen providers.
+prism illustrates a useful pattern: local information first, optional catalog lookup, and opt-in acoustic recognition. klobvision can use a similar hierarchy with independently chosen providers.
 
 Network recognition must be optional, bounded, and asynchronous. Show when an audio excerpt will leave the device. Never make a provider response the master beat clock. Never embed private API keys in a public frontend bundle.
 
@@ -380,9 +401,11 @@ External keys may require a user-controlled backend or provider-supported browse
 
 - Control page: preview, scene/preset library, layer/effect inspector, mappings/macros, audio transport, timing status, and output controls.
 - Output page: only the rendered composition.
-- “Open output” uses an explicit user gesture. The user can move the window to the desired monitor and enter fullscreen.
+- `OPEN OUTPUT` uses an explicit user gesture. The user can move the window to the desired monitor and enter fullscreen.
 - If programmatic display placement is available, use it as an enhancement; manual placement remains supported.
 - Blackout, freeze, resume, and output reconnection should be simple actions.
+
+Apply the section 2 visual system to control-page chrome and any setup/reconnection UI. The clean output contains only authored visuals. Theme changes must not alter the output, reset scene state, disturb musical timing, or recreate the renderer. Keep essential status and performance controls discoverable in compact and expanded layouts.
 
 Use same-origin messaging for scene commands and timestamped state. BroadcastChannel or a MessagePort can carry control/state data. Do not assume MediaStream objects can be sent through these channels.
 
@@ -414,9 +437,11 @@ Separate three kinds of state:
 |---|---|
 | Project/preset | Scenes, layers, generators, effects, mappings, palettes, cues, assets |
 | Session | Active source, transport, manual timing, current analysis, output connection |
-| Device preferences | Preview quality, preferred devices, local storage, display preferences |
+| Device preferences | Preview quality, preferred devices, local storage, display preferences, theme mode (`system`, `light`, or `dark`) |
 
 Recalling a look must not change the capture device or unexpectedly restart playback.
+
+Persist the selected theme mode, including `system`, rather than replacing it with the currently resolved light/dark appearance. Project import and look recall must not overwrite device theme preferences. Follow OS changes only while System is selected; an explicit Light or Dark choice remains in force until changed.
 
 Use versioned JSON with stable IDs. Provide project import/export, preset import/export, schema validation, migrations, and an undoable command model for edits.
 
@@ -437,7 +462,7 @@ Use typed values and stable units. Avoid exposing implementation-specific shader
 
 Provide clean visual recording with optional audio from the active source. Editor controls and diagnostics must stay outside the captured canvas.
 
-Start with canvas.captureStream and MediaRecorder where supported. Probe codec/container support and report what was actually configured. Do not promise native Prism's H.264/AAC MP4 output on every browser. [S15, S16]
+Start with canvas.captureStream and MediaRecorder where supported. Probe codec/container support and report what was actually configured. Do not promise native prism's H.264/AAC MP4 output on every browser. [S15, S16]
 
 Establish a tested stream path between the output canvas and the session's audio source. Same-origin window access can be used deliberately; do not assume a broadcast channel transfers media streams.
 
@@ -493,7 +518,7 @@ The webapp should have a usable responsive Android layout for experimentation, l
 
 Android system-audio capture may later use a small native companion. That companion supplies timestamped input/features or integration services; the PC webapp remains independently functional.
 
-Prism's native capture behavior is a reference. Any specialized compatibility mechanism requires its own explicit decision and device validation. Android-native packaging, native recording, and external-display support should not delay the primary web release.
+prism's native capture behavior is a reference. Any specialized compatibility mechanism requires its own explicit decision and device validation. Android-native packaging, native recording, and external-display support should not delay the primary web release.
 
 ## 17. Implementation milestones
 
@@ -502,6 +527,7 @@ These milestones are an implementation sequence, not a reduction of the requeste
 ### M0: Browser feasibility and project skeleton
 
 - Initialize klobvision with the chosen license and basic project structure.
+- Establish neutral surface/accent tokens, locally hosted Space Grotesk with its license, and lowercase app branding using section 2.
 - Render a GPU scene with frame-time diagnostics and no fixed frame cap.
 - Open the separate output window.
 - Verify real system audio from the target Windows browser.
@@ -517,6 +543,7 @@ These milestones are an implementation sequence, not a reduction of the requeste
 - Manual tempo/bar/phrase controls.
 - Initial effect chain, bounded randomization, scene save/recall, undo.
 - Output blackout/freeze and lightweight preview.
+- Apply the editor visual system throughout the usable interface, including accessible icon controls and persistent System/Light/Dark selection.
 
 **Exit:** A user can improvise a visually satisfying show with manual musical timing.
 
@@ -561,6 +588,9 @@ Favor tests for timing, state, geometry, and capability boundaries over tests th
 
 | Area | Meaningful checks |
 |---|---|
+| Interface and branding | Neutral surfaces and specified accents in both themes; readable text/controls and visible focus; keyboard-operable theme icons with accessible names and selected states; uppercase primary actions with lowercase klobvision branding, including install labels |
+| Theme and font behavior | System follows live OS changes and falls back to dark when undetectable; explicit choices survive restart; project/scene changes preserve device preferences; Space Grotesk loads from local assets and its license is distributed |
+| Editor/output independence | Theme changes preserve the authored composition, scene state, and musical timing. Layout changes may resize the preview without resetting animation or altering projected/recorded composition. Essential controls remain accessible, and neither operation introduces sustained output-performance regressions. |
 | Morphing | Correct endpoints, direct hexagon-to-triangle wrap, stable centers, predictable intermediate contour |
 | Musical clock | Tempo changes, half/double correction, pause/seek, manual release, confidence loss, no duplicated cues |
 | Analysis | Annotated real 4/4 tracks plus synthetic known-timing fixtures; acquisition and failure cases reported separately |
@@ -580,8 +610,8 @@ A beat detector looking convincing on one song is not validation. A synthetic ti
 
 The following instructions apply once implementation is requested. During the current planning phase, refine this document and evaluate design choices without starting application development.
 
-1. Treat sections 1 and 15 as authoritative product constraints.
-2. Build a fresh klobvision repository/application. Use Prism to understand feature ideas.
+1. Treat sections 1, 2, and 15 as authoritative product constraints. Apply the relevant current global and repository `AGENTS.md` instructions when available; the standards restated here remain sufficient to begin without access to the owner's dotfiles.
+2. Build a fresh klobvision application in this repository. Use prism to understand feature ideas.
 3. Read current primary documentation and existing libraries before implementing specialized graphics, DSP, or recognition.
 4. Keep the first vertical slice small: GPU grid, controls, separate output, manual clock, save/recall.
 5. Make the PC browser standalone. Audio analysis, playback, and rendering must not require Android.
@@ -593,15 +623,30 @@ The following instructions apply once implementation is requested. During the cu
 11. Track all four song-recognition requirements even when they land in later milestones.
 12. Deliver working increments with concise setup instructions, known capability limits, and measured evidence.
 
+### Repository and contribution rules
+
+Carry forward the applicable global working rules alongside the product standards. [G1]
+
+- Preserve unrelated work and keep changes scoped to the current request. The present authorization remains documentation and planning only.
+- Keep shared instructions agent-agnostic. Label any tool-specific workflow explicitly.
+- Keep product and contributor-facing prose plain and concise, with no em dashes. Use symbols only when they improve readability; fence multiline code.
+- Before a public write, verify the active project account, repository permissions, destination, human author/committer identity, approved email, and signing configuration. Keep authentication scoped to the project and avoid silently inheriting unrelated machine defaults.
+- For AI-assisted commits, credit the appropriate human project identity as author and committer, then the primary agent in a `Co-authored-by` trailer. Include the verified agent product, model family/version, and reasoning effort; mark unavailable fields `unknown`. Verify these against the active session rather than copying examples or configured defaults. Credit the primary agent rather than every subagent.
+- Include only reusable project requirements in public instructions. Keep unrelated personal context, credentials, machine-specific paths, and private identity mappings out of repository content and public history.
+
 ### Licensing and reuse
 
 Apply AGPL-3.0-or-later to original klobvision code. Keep dependency, shader, model, and asset provenance separate. Model licenses do not automatically match the code license.
 
-The reviewed Prism snapshot lacks a root project LICENSE file, although third-party model/runtime notices exist. If code is selectively reused, explicitly establish the license for the owned code and retain upstream attribution. Referencing behavior does not require copying implementation. [P6]
+The reviewed prism snapshot lacks a root project LICENSE file, although third-party model/runtime notices exist. If code is selectively reused, explicitly establish the license for the owned code and retain upstream attribution. Referencing behavior does not require copying implementation. [P6]
 
 ## 20. Sources and reference material
 
 Primary sources were checked during preparation. Recheck compatibility and exact dependency versions when development begins.
+
+### Owner product and working standards
+
+- **[G1]** [Base `AGENTS.md` in xklob/dotfiles](https://github.com/xklob/dotfiles/blob/b7ec9a777ef3005df6e69669671572aa09f3ba47/AGENTS.md), reviewed November 19, 2026. Relevant visual, product, and contribution requirements are restated in this handoff. The source identifies [klob.io](https://klob.io) as the visual baseline; this update applies the source's explicit rules. Contributors do not need source-repository access to follow them.
 
 ### Web graphics and media
 
@@ -628,7 +673,7 @@ Primary sources were checked during preparation. Recheck compatibility and exact
 - **[S14]** [Chromaprint scope](https://github.com/acoustid/chromaprint)
 - [Essentia library/model licensing](https://essentia.upf.edu/licensing_information.html)
 
-### Prism feature-reference snapshot
+### prism feature-reference snapshot
 
 All links below are pinned to the reviewed commit.
 
