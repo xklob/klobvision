@@ -5,11 +5,11 @@
 **Purpose:** A self-contained brief for a coding agent or developer starting the project.  
 **Status:** Product and engineering design. No application has been implemented or benchmarked as part of this handoff.
 
-**Execution boundary:** The current request authorizes design and planning only. The implementation milestones and coding-agent instructions below describe future work; begin application development only after the user explicitly starts that phase.
+**Execution boundary:** The current request authorizes this handoff update only. The next agent must complete **Phase A: visual design and feedback**, covering both the control screen and the projected performance, followed by **Phase B: architecture clarification and feedback**. Begin application development only after both phase outcomes have been accepted and the user explicitly starts implementation. Resume at the earliest unfinished phase unless the user explicitly changes this sequence. See section 17 for deliverables and review gates.
 
 ## 1. Read this first
 
-Build **klobvision**, an open-source, GPU-accelerated visual show designer for live performance and experimentation.
+The eventual product is **klobvision**, an open-source, GPU-accelerated visual show designer for live performance and experimentation. The next activity is collaborative visual design, followed by architecture clarification.
 
 The primary product is a **PC webapp**. It should render directly through browser GPU APIs, provide a separate control surface and clean output screen, and be enjoyable to play with before it becomes a large authoring system.
 
@@ -29,6 +29,8 @@ These decisions incorporate the user's latest clarifications and take precedence
 Develop from these requirements. Any proposed reuse from prism should be a small, explicit engineering choice supported by suitability, licensing, and tests.
 
 Apply the owner's existing global product and visual-design standards, restated in section 2 and the contribution rules in section 19. These come from the reviewed `xklob/dotfiles` base `AGENTS.md`. Keep this handoff self-contained for contributors; access to that source repository is not a prerequisite. Explicit project decisions and the user's current instructions take precedence over general defaults. [G1]
+
+The existing visual references and engineering recommendations are starting material for the two review phases. Preserve the settled product constraints above while refining the appearance, interactions, and implementation choices with the user. Lead those reviews with mockups, motion studies, and diagrams; keep the required reading short.
 
 ## 2. Product identity and first experience
 
@@ -81,7 +83,7 @@ These are starting presets and visual primitives, not restrictions on every futu
 
 ### First demo preset
 
-Create a “Polygon Pulse” preset at **124 BPM**:
+Use this proposed “Polygon Pulse” preset at **124 BPM** as a motion study during Phase A, then implement the agreed version during development:
 
 - One shape change per quarter-note beat.
 - Four changes complete the repeating four-shape cycle.
@@ -118,7 +120,9 @@ Do not inherit incidental limits such as a fixed 32-look library, one-file cache
 
 ## 4. Recommended technology choices
 
-| Area | Initial choice | Reason |
+The choices below are provisional candidates for Phase B. Confirm or revise them after the visual direction is accepted, explaining significant tradeoffs with diagrams and short comparisons. The PC webapp, GPU rendering, and sustainable high-refresh requirements remain product constraints.
+
+| Area | Candidate for architecture review | Reason |
 |---|---|---|
 | Language/build | TypeScript, Vite | Straightforward browser development and static deployment |
 | Editor UI | React | Forms, compact panels, scene management, and responsive layout following the section 2 visual system |
@@ -133,7 +137,7 @@ Do not inherit incidental limits such as a fixed 32-look library, one-file cache
 
 Three.js's current WebGLRenderer uses WebGL2, and EffectComposer supports ordered post-processing passes. These are suitable building blocks; the application still owns its scene model and timing. [S1, S2]
 
-**WebGL2 is already GPU acceleration.** WebGPU is a future renderer or compute option when a benchmark or required feature warrants it. Keep visual generators behind a modest renderer interface, but build one working backend first.
+**WebGL2 is already GPU acceleration.** WebGPU is a future renderer or compute option when a benchmark or required feature warrants it. During authorized implementation, keep visual generators behind a modest renderer interface and build one working backend first.
 
 React must not own per-frame scene state. The visual runtime reads compact mutable runtime state, updates GPU uniforms/buffers, and renders independently.
 
@@ -310,7 +314,7 @@ Pitch, chroma, and musical key are distinct outputs. Allow key to be unknown dur
 
 Meyda supports live and offline extraction. Essentia.js exposes analysis through WASM, while Essentia explicitly states that RhythmExtractor2013 requires whole-track statistics. Beat This! Live publishes MIT-licensed code and weights. [S6–S9]
 
-Do a short, comparative technical spike, then choose and document a backend. Do not build a product dependency on a research model before checking runtime support, distribution rights, latency, and behavior on representative music.
+During Phase B, compare existing evidence and primary documentation, recommend a backend, and identify unresolved feasibility checks. Run the comparative code-based spike during authorized implementation, unless the user separately requests a specific earlier experiment. Confirm the backend against runtime support, distribution rights, latency, and representative music before making it a product dependency.
 
 Keep the analyzer replaceable. Exact parity with prism is not a requirement.
 
@@ -520,11 +524,67 @@ Android system-audio capture may later use a small native companion. That compan
 
 prism's native capture behavior is a reference. Any specialized compatibility mechanism requires its own explicit decision and device validation. Android-native packaging, native recording, and external-display support should not delay the primary web release.
 
-## 17. Implementation milestones
+## 17. Required review phases and implementation milestones
 
-These milestones are an implementation sequence, not a reduction of the requested feature set.
+**Current status:** Phase A is pending; Phase B is pending; application implementation has not started. Update this status and link the accepted artifacts as the phases are completed.
+
+The user requires two distinct collaborative planning phases before M0. Complete the visual direction first, then flesh out the architecture against that agreed experience. The reviews should be understandable primarily from visuals, with brief captions and focused questions.
+
+```mermaid
+flowchart TD
+    V["Phase A: visual design"] --> VR{"Visual direction accepted?"}
+    VR -->|Revise| V
+    VR -->|Yes| A["Phase B: architecture"]
+    A --> AR{"Architecture accepted?"}
+    AR -->|Revise| A
+    AR -->|Yes| P["Agreed plans"]
+    P -->|"User starts implementation"| I["M0 and later milestones"]
+```
+
+### Phase A: Visual design and feedback
+
+Prepare concrete proposals for both the operator's experience and the audience's view. Use the existing requirements as the starting point; ask questions about meaningful unresolved choices rather than reopening settled decisions. Present a small set of comparable concepts, recommend a direction, and iterate from the user's feedback.
+
+| Review artifact | What it must make clear |
+|---|---|
+| Control-screen concepts | Two or three annotated layout alternatives showing preview, scene/look selection, geometry/effect controls, audio source and transport, beat/bar/phrase status, macros, blackout, and recording. Compare density, hierarchy, and access during live use. |
+| Refined control-screen mockups | Develop the selected direction in light and dark themes using section 2. Show the main PC layout plus compact-panel behavior. Include small state examples for manual/automatic timing, unavailable audio, analysis in progress, and active recording where these change the interaction. Keep Android secondary. |
+| Performance appearance boards | Show proposed output compositions with shape size/density/spacing, outlines, backgrounds, hue behavior, and restrained versus intense effects. Include clean geometry and representative shader treatments so their contribution is visible. Keep the creative palette independent of editor styling. |
+| Motion studies | Provide short looping videos, GIFs, or isolated interactive previews showing the proposed morph/hold rhythm, beat synchronization, continuous hue movement, and scene transitions. Use the 124 BPM reference as one example and label timing. Static images alone do not settle motion. Label these as design studies, with no implied runtime-performance benchmark. |
+| Paired control/output walkthrough | Show at least one control-screen view alongside its resulting projected composition. Use a brief storyboard or annotated interaction diagram to show how selecting a look, changing a parameter, and triggering a timed transition affect the audience's view. |
+
+Lead each feedback round with the artifacts. Ask a few targeted questions tied to visible alternatives, such as panel density, which controls stay immediately available, morph character, or effect intensity. Revise the selected direction and show the changes before asking for acceptance.
+
+**Exit gate:** The user accepts both the control-screen direction and the performance appearance/motion, with material feedback incorporated. Record the accepted artifacts and decisions, plus any explicitly deferred details. Acceptance of one screen or one mockup leaves the other outstanding items visible. Once this gate is complete, proceed to Phase B.
+
+### Phase B: Architecture clarification and feedback
+
+Start after Phase A is accepted. Turn the agreed experience into a concrete system plan, using the engineering sections of this handoff as proposals to validate and refine. Keep the discussion centered on consequences the user can assess: responsiveness, control/output behavior, visual flexibility, source compatibility, offline use, and implementation complexity.
+
+| Visual aid | Questions it should answer |
+|---|---|
+| System overview | How do audio sources, analysis, the musical clock, modulation, scenes, rendering, preview, and recording relate? Which capabilities run locally, and which optional adapters use a network service? |
+| Browser/runtime diagram | What lives in the control window, output window, AudioWorklet, and analysis workers? Who owns audio, transport, scene state, and rendering? Label communication paths and distinguish commands, features, and media streams. Keep actual process isolation assumptions explicit. |
+| Timing and lifecycle diagrams | Use small sequence/state diagrams for the flows that need clarification: a detected beat reaching the visuals, manual override, seek/source changes, and output reconnection. Show timestamp ownership and stale-result handling without exposing every internal function. |
+| Rendering and state views | Show how geometry, layers, shader effects, output, preview, and recording share resources. Explain the high-refresh strategy and distinguish project state, session state, device preferences, and cached file analysis. Split these into separate diagrams if combining them obscures the relationships. |
+
+Accompany consequential choices with short decision cards: recommendation, credible alternative, main tradeoff, and evidence or capability check still needed. Confirm the stack and module boundaries here. Keep unmeasured performance and browser-routing assumptions explicit, with bounded validation tasks assigned to the implementation milestones.
+
+**Exit gate:** The user accepts the architecture, the scoped first implementation increment, and the remaining deferred decisions or feasibility checks. Save the diagrams and decisions and update this handoff to match. If a technical constraint materially changes the accepted visual experience, revisit that affected design with the user before finalizing the architecture.
+
+### Presentation, artifacts, and transition to implementation
+
+- Make visuals the main review surface. Use short captions, clear legends, and compact comparisons; keep detailed API notes and exhaustive reasoning in linked supporting material. Break large diagrams into focused views.
+- Keep review artifacts in the repository, for example `docs/design/` and `docs/architecture/`, with a short index linked from this handoff. Preserve editable diagram/mockup sources and viewable exports or previews, including motion studies. Avoid relying on temporary external links for the agreed plan.
+- During these phases, scope work to research, documentation, visual assets, and isolated presentation prototypes. Design previews may use lightweight rendering or simulated timing to communicate appearance and interaction. Application scaffolding, production audio/GPU integration, and code-based feasibility spikes belong to authorized implementation unless the user separately requests a specific experiment.
+- Maintain a compact decision log showing accepted choices, revisions, open questions, deferred items, and the user's phase acceptance. Carry existing acceptance forward; request another decision only when the corresponding plan materially changes. Silence does not complete a review gate.
+- Completing Phase B leaves an agreed implementation plan ready. Begin M0 when both review gates are complete and the user has requested implementation. Honor any existing explicit authorization to implement after those gates. A request that accepts the architecture and explicitly starts development can also satisfy both actions without another confirmation.
+
+The milestones below begin with implementation. They retain the full requested feature set and should be refined to match the accepted designs and architecture.
 
 ### M0: Browser feasibility and project skeleton
+
+**Entry:** Both review phases are accepted and the user has started implementation.
 
 - Initialize klobvision with the chosen license and basic project structure.
 - Establish neutral surface/accent tokens, locally hosted Space Grotesk with its license, and lowercase app branding using section 2.
@@ -584,6 +644,8 @@ These milestones are an implementation sequence, not a reduction of the requeste
 
 ## 18. Verification that matters
 
+Before implementation, verify that both the control UI and performance motion were reviewed, the feedback is reflected in the accepted artifacts, architecture diagrams and decisions are agreed, and section 17 records the current phase accurately. Mockups and planning diagrams provide design evidence; runtime and hardware claims require the implementation checks below.
+
 Favor tests for timing, state, geometry, and capability boundaries over tests that merely mirror UI implementation.
 
 | Area | Meaningful checks |
@@ -608,20 +670,22 @@ A beat detector looking convincing on one song is not validation. A synthetic ti
 
 ## 19. Instructions to the implementing agent
 
-The following instructions apply once implementation is requested. During the current planning phase, refine this document and evaluate design choices without starting application development.
+Begin with the earliest unfinished review phase in section 17. A general request to continue from this handoff starts or resumes that phase. Follow the design-review sequence unless the user explicitly changes it; application implementation requires accepted visual and architecture outcomes and an explicit implementation kickoff.
 
-1. Treat sections 1, 2, and 15 as authoritative product constraints. Apply the relevant current global and repository `AGENTS.md` instructions when available; the standards restated here remain sufficient to begin without access to the owner's dotfiles.
-2. Build a fresh klobvision application in this repository. Use prism to understand feature ideas.
-3. Read current primary documentation and existing libraries before implementing specialized graphics, DSP, or recognition.
-4. Keep the first vertical slice small: GPU grid, controls, separate output, manual clock, save/recall.
-5. Make the PC browser standalone. Audio analysis, playback, and rendering must not require Android.
-6. Compare analysis candidates in a bounded spike, record the choice, then implement it.
-7. Keep expensive operations off the UI/rendering path and maintain source timestamps.
-8. Preserve modular boundaries without constructing a large general-purpose plugin framework.
-9. Make uncertainty visible and manual correction easy.
-10. Validate the actual high-refresh and source-capture paths on real target hardware.
-11. Track all four song-recognition requirements even when they land in later milestones.
-12. Deliver working increments with concise setup instructions, known capability limits, and measured evidence.
+1. Treat sections 1, 2, and 15 as authoritative product constraints, and section 17 as the required work sequence. Apply the relevant current global and repository `AGENTS.md` instructions when available; the standards restated here remain sufficient to begin without access to the owner's dotfiles.
+2. In Phase A, show control-screen mockups, performance appearance and motion studies, and a paired walkthrough. Incorporate feedback and record acceptance before Phase B.
+3. In Phase B, use diagrams and concise decision cards to agree on the architecture and first implementation increment. Treat the current stack and module choices as candidates until this review is complete.
+4. After both review gates and the implementation kickoff, build a fresh klobvision application in this repository. Use prism to understand feature ideas.
+5. Read current primary documentation and existing libraries before implementing specialized graphics, DSP, or recognition.
+6. Keep the first vertical slice small: GPU grid, controls, separate output, manual clock, save/recall.
+7. Make the PC browser standalone. Audio analysis, playback, and rendering must not require Android.
+8. During authorized implementation, compare analysis candidates in a bounded spike, record the choice, then integrate the selected backend.
+9. Keep expensive operations off the UI/rendering path and maintain source timestamps.
+10. Preserve modular boundaries without constructing a large general-purpose plugin framework.
+11. Make uncertainty visible and manual correction easy.
+12. Validate the actual high-refresh and source-capture paths on real target hardware.
+13. Track all four song-recognition requirements even when they land in later milestones.
+14. Deliver working increments with concise setup instructions, known capability limits, and measured evidence.
 
 ### Repository and contribution rules
 
